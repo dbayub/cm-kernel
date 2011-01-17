@@ -48,6 +48,7 @@
 #include <linux/gpio_event.h>
 #include <linux/mtd/nand.h>
 #include <linux/mtd/partitions.h>
+#include <linux/i2c-msm.h>
 
 #include <asm/mach/mmc.h>
 #include <linux/mmc/sdio_ids.h>
@@ -867,10 +868,16 @@ static struct platform_device hero_snd = {
 	},
 };
 
+static struct msm_i2c_device_platform_data heroc_i2c_device_data = {
+        .i2c_clock = 100000,
+        .clock_strength = GPIO_8MA,
+        .data_strength = GPIO_4MA,
+};
+
 static struct platform_device *devices[] __initdata = {
 	&msm_device_smd,
 	&msm_device_nand,
-//	&msm_device_i2c,
+	&msm_device_i2c,
 #ifdef CONFIG_HEROC_SERIAL
 #ifdef CONFIG_SERIAL_MSM_HS
         &msm_device_uart_dm1,
@@ -1001,6 +1008,7 @@ static void __init heroc_init(void)
 	if (rc)
 		printk(KERN_CRIT "%s: MMC init failure (%d)\n", __func__, rc);
 
+	msm_device_i2c.dev.platform_data = &heroc_i2c_device_data;
 	platform_add_devices(devices, ARRAY_SIZE(devices));
 
 	for (rc=0;rc<ARRAY_SIZE(i2c_devices);rc++){

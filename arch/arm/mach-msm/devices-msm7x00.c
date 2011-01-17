@@ -200,7 +200,7 @@ struct platform_device msm_device_i2c = {
 
 #define GPIO_I2C_CLK 60
 #define GPIO_I2C_DAT 61
-void msm_set_i2c_mux(bool gpio, int *gpio_clk, int *gpio_dat)
+void msm_set_i2c_mux(bool gpio, int *gpio_clk, int *gpio_dat, int clk_str, int dat_str)
 {
 	unsigned id;
 	if (gpio) {
@@ -214,10 +214,10 @@ void msm_set_i2c_mux(bool gpio, int *gpio_clk, int *gpio_dat)
 		*gpio_dat = GPIO_I2C_DAT;
 	} else {
 		id = PCOM_GPIO_CFG(GPIO_I2C_CLK, 1, GPIO_INPUT,
-				   GPIO_NO_PULL, GPIO_8MA);
+				   GPIO_NO_PULL, clk_str);
 		msm_proc_comm(PCOM_RPC_GPIO_TLMM_CONFIG_EX, &id, 0);
 		id = PCOM_GPIO_CFG(GPIO_I2C_DAT , 1, GPIO_INPUT,
-				   GPIO_NO_PULL, GPIO_8MA);
+				   GPIO_NO_PULL, dat_str);
 		msm_proc_comm(PCOM_RPC_GPIO_TLMM_CONFIG_EX, &id, 0);
 	}
 }
