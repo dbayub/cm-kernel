@@ -488,13 +488,13 @@ msm_i2c_probe(struct platform_device *pdev)
                 dev->clk_drv_str = pdata->clock_strength;
                 dev->dat_drv_str = pdata->data_strength;
                 if (pdata->i2c_clock < 100000 || pdata->i2c_clock > 400000)
-                        i2c_clk = 100000;
+                        target_clk = 100000;
                 else
-                        i2c_clk = pdata->i2c_clock;
+                        target_clk = pdata->i2c_clock;
         } else {
                 dev->clk_drv_str = 0;
                 dev->dat_drv_str = 0;
-                i2c_clk = 100000;
+                target_clk = 100000;
         }
 	
 
@@ -506,7 +506,7 @@ msm_i2c_probe(struct platform_device *pdev)
 	/* I2C_FS_CLK = I2C_CLK/(2*(FS_DIVIDER_VALUE+3) */
 	/* FS_DIVIDER_VALUE = ((I2C_CLK / I2C_FS_CLK) / 2) - 3 */
 	i2c_clk = 19200000; /* input clock */
-	target_clk = 100000;
+//	target_clk = 100000;
 	/* target_clk = 200000; */
 	fs_div = ((i2c_clk / target_clk) / 2) - 3;
 	hs_div = 3;
