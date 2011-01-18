@@ -17,20 +17,27 @@
 #include <linux/platform_device.h>
 #include <linux/interrupt.h>
 #include <linux/dma-mapping.h>
+#include <linux/delay.h>
 
 #include <mach/irqs.h>
 #include <mach/msm_iomap.h>
 #include <mach/dma.h>
-#include "devices.h"
-#include "proc_comm.h"
 
 #include <asm/mach/flash.h>
 #include <linux/mtd/nand.h>
 #include <linux/mtd/partitions.h>
+#include <asm/mach/mmc.h>
+#include <asm/setup.h>
 
-
+#include "devices.h"
 #include "clock.h"
-#include <mach/mmc.h>
+#include "proc_comm.h"
+#include <mach/msm_hsusb.h>
+#include <mach/msm_rpcrouter.h>
+#include <mach/msm_hsusb_hw.h>
+#include <mach/gpio.h>
+
+static char *df_serialno = "000000000000";
 
 static struct resource resources_uart1[] = {
 	{
@@ -220,6 +227,22 @@ void msm_set_i2c_mux(bool gpio, int *gpio_clk, int *gpio_dat, int clk_str, int d
 				   GPIO_NO_PULL, dat_str);
 		msm_proc_comm(PCOM_RPC_GPIO_TLMM_CONFIG_EX, &id, 0);
 	}
+}
+
+static int melfas_reset_pin;
+void set_melfas_reset_pin(int gpio)
+{
+        melfas_reset_pin = gpio;
+}
+
+void reset_melfas(void)
+{
+        if (melfas_reset_pin) {
+                gpio_set_value(melfas_reset_pin, 0);
+                msleep(2);
+                gpio_set_value(melfas_reset_pin, 1);
+                msleep(260);
+        }
 }
 
 static struct resource resources_hsusb[] = {
@@ -597,6 +620,7 @@ struct clk msm_clocks_7x01a[] = {
 	CLK_PCOM("vdc_clk",	VDC_CLK,	NULL, OFF | CLK_MINMAX),
 	CLK_PCOM("vfe_clk",	VFE_CLK,	NULL, OFF),
 	CLK_PCOM("vfe_mdc_clk",	VFE_MDC_CLK,	NULL, OFF),
+	CLK_PCOM("spi_clk", 	SPI_CLK, 	NULL, 0),
 };
 
 unsigned msm_num_clocks_7x01a = ARRAY_SIZE(msm_clocks_7x01a);

@@ -670,7 +670,7 @@ static irqreturn_t microp_i2c_intr_irq_handler(int irq, void *dev_id)
 	client = to_i2c_client(dev_id);
 	cdata = i2c_get_clientdata(client);
 
-	disable_irq(client->irq);
+	disable_irq_nosync(client->irq);
 	queue_work(cdata->microp_queue, &cdata->work.work);
 	return IRQ_HANDLED;
 }
@@ -733,9 +733,7 @@ int microp_get_3_button_value(void *argu)
 	unsigned char loop_i;
 	unsigned short adc_level[4][2] =
 		{{200, 0x3FF}, {0, 33}, {38, 82}, {95, 167} };
-#ifdef CONFIG_HTC_HEADSET_V1
 	int *detect_key = (int *) argu;
-#endif
 
 	ret = get_adc_value(remote_adc_read_channel, &value_tmp);
 	if (ret < 0) {
@@ -1269,7 +1267,6 @@ static int lightsensor_disable(void)
 	pr_info("%s\n", __func__);
 	atomic_set(&als_intr_enable_flag, 0);
 	if (atomic_read(&cdata->suspended_now)) {
-		atomic_set(&als_intr_enabled, 0);
 		pr_err("%s: microp is suspended\n", __func__);
 		return 0;
 	}
@@ -2449,8 +2446,8 @@ exit:
 static void microp_early_suspend(struct early_suspend *h)
 {
 	int ret;
-#if 0
 	uint8_t data[2];
+#if 0
 	uint8_t lcd_backlight_value = 0x10;
 	uint8_t lcd_backlight_pin = 6;
 	uint8_t lcd_backlight_level = 50;
@@ -2875,9 +2872,8 @@ static int microp_i2c_probe(struct i2c_client *client,
 	INIT_DELAYED_WORK(&auto_bl_delay_work,
 			microp_i2c_auto_bl_work_func);
 
-	// Riemer: Does not work
 	/* Light Sensor */
-	/*cdata->ls_input_dev = input_allocate_device();
+	cdata->ls_input_dev = input_allocate_device();
 	if (!cdata->ls_input_dev) {
 		pr_err("%s: could not allocate input device\n", __func__);
 		ret = -ENOMEM;
@@ -2899,7 +2895,7 @@ static int microp_i2c_probe(struct i2c_client *client,
 		dev_err(&client->dev, "%s: can not register misc device\n",
 				__func__);
 		goto err_register_misc_register;
-	}*/
+	}
 
 #ifdef CONFIG_HAS_EARLYSUSPEND
 	if (cdata->enable_early_suspend)	{

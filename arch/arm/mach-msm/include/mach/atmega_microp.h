@@ -237,6 +237,24 @@ struct lightsensor_platform_data{
 	int old_intr_cmd;
 };
 
+struct microp_oj_callback {
+       void (*oj_init)(void);
+       void (*oj_intr)(void);
+};
+
+struct microp_psensor_callback {
+       void (*ps_init)(void);
+       void (*ps_intr)(int ps_data);
+};
+
+struct microp_bl_callback {
+       void (*bl_change)(int level);
+};
+
+struct microp_gs_callback{
+       void (*gs_init)(void);
+};
+
 struct microp_ops {
 	int (*init_microp_func)(struct i2c_client *);
 	int (*als_pwr_enable)(int pwr_device, uint8_t en);
@@ -257,9 +275,15 @@ int microp_write_interrupt(struct i2c_client *client,
 		uint16_t interrupt, uint8_t enable);
 void microp_get_als_kvalue(int i);
 int microp_spi_vote_enable(int spi_device, uint8_t enable);
+int microp_register_oj_callback(struct microp_oj_callback *oj);
+int microp_register_ps_callback(struct microp_psensor_callback *ps);
+void microp_register_backlight_callback(struct microp_bl_callback *bl);
 void microp_register_ops(struct microp_ops *ops);
+int microp_notify_unplug_mic(void);
+int microp_notify_mic_value(void);
 
 int microp_read_adc(uint8_t *data);
+struct i2c_client *get_microp_client(void);
 void microp_mobeam_enable(int enable);
 
 #endif /* _LINUX_ATMEGA_MICROP_H */

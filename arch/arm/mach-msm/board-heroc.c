@@ -172,6 +172,8 @@ static struct synaptics_i2c_rmi_platform_data heroc_ts_data[] = {
 	}
 };
 #endif
+static void heroc_microp_intr_function(uint8_t *pin_status);
+static int heroc_microp_intr_debounce(uint8_t *pin_status);
 
 static struct microp_pin_config microp_pins_0[] = {
 	MICROP_PIN(0, MICROP_PIN_CONFIG_GPO),
@@ -223,9 +225,9 @@ static struct microp_pin_config microp_pins_0[] = {
 		.pin	= 16,
 		.config  = MICROP_PIN_CONFIG_INTR_ALL,
 		.mask	 = { 0x00, 0x00, 0x00 },
-//		.intr_debounce = heroc_microp_intr_debounce,
-//                .intr_function = heroc_microp_intr_function,
-                .init_intr_function = 0,
+		.intr_debounce = heroc_microp_intr_debounce,
+                .intr_function = heroc_microp_intr_function,
+                .init_intr_function = 1,
 	}
 };
 
@@ -291,9 +293,9 @@ static struct microp_pin_config microp_pins_1[] = {
 		.pin	= 18,
 		.config  = MICROP_PIN_CONFIG_INTR_ALL,
 		.mask	 = { 0x00, 0x00, 0x00 },
-//		.intr_debounce = heroc_microp_intr_debounce,
-//                .intr_function = heroc_microp_intr_function,
-                .init_intr_function = 0,
+		.intr_debounce = heroc_microp_intr_debounce,
+                .intr_function = heroc_microp_intr_function,
+                .init_intr_function = 1,
 	},
 };
 
@@ -312,7 +314,12 @@ void heroc_headset_mic_select(uint8_t select)
 {
 	microp_i2c_set_pin_mode(4, select, microp_data.dev_id);
 }
-
+static int heroc_microp_intr_debounce(uint8_t *pin_status)
+{
+/*Per HW RD's request, wait 300 mill-seconds.*/
+        mdelay(100);
+        return 0;
+}
 static void heroc_microp_intr_function(uint8_t *pin_status)
 {
 	static int last_insert = 0;

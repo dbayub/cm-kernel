@@ -275,7 +275,6 @@ static int lightsensor_disable(void)
 	pr_info("%s\n", __func__);
 	ls_enable_flag = 0;
 	if (li->is_suspend) {
-		li->als_intr_enabled = 0;
 		pr_err("%s: microp is suspended\n", __func__);
 		return 0;
 	}
