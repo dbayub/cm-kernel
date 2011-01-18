@@ -1028,13 +1028,12 @@ static void __init heroc_init(void)
 	    if (!strcmp(i2c_devices[rc].type, MICROP_I2C_NAME))
                     i2c_devices[rc].irq = MSM_GPIO_TO_INT(HEROC_GPIO_UP_INT_N);
         }
-	if(system_rev >= 2) {
-		microp_data.num_pins = ARRAY_SIZE(microp_pins_1);
-                microp_data.pin_config = microp_pins_1;
-	} else if(system_rev < 2) {
+	if(system_rev < 2) {
 		microp_data.num_pins   = ARRAY_SIZE(microp_pins_0);
 		microp_data.pin_config = microp_pins_0;
 	}
+	if(system_rev > 1)
+		heroc_h2w_data.flags |= _35MM_MIC_DET_L2H;
 
 	i2c_register_board_info(0, i2c_devices, ARRAY_SIZE(i2c_devices));
 
